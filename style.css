@@ -1,0 +1,26 @@
+body {
+    background-color: lightgrey;
+    color: darkgray;
+    font-family: 'Roboto';
+    font-size: 1.5 rem;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+}
+
+#library {
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 1rem;
+}
+
+.book {
+    background-color: whitesmoke;
+}
+
+ul {
+    list-style: none;
+}
