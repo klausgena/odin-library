@@ -17,20 +17,20 @@ function addBookToLibrary(title, author, pages, read) {
     myLibrary.push(newBook);
 }
 
-function createBookHTML(bookObject) {
+function createBookHTML(bookObject, index) {
     let bookHTML = "<div class='book'>";
     for (let key in bookObject) {
         if (key == "info") { continue; };
         let bookElement = `<p class='${key}'>${key}: ${bookObject[key]}</p>`;
         bookHTML = bookHTML + bookElement;
     }
-    return bookHTML + "</div>";
+    return bookHTML + `<div><button class="delete" data-index=${index}>-</button ></div ><div><label for="read">Read?</label><input type="checkbox" id="read"></div></div>`;
 }
 
 function createLibraryHTML(booksArray) {
     let libraryHTML = "";
-    booksArray.forEach(book => {
-        let bookHTML = createBookHTML(book);
+    booksArray.forEach((book, index) => {
+        let bookHTML = createBookHTML(book, index);
         libraryHTML = libraryHTML + bookHTML;
     });
     return libraryHTML;
@@ -51,10 +51,12 @@ addBookToLibrary("Lolita", "Vladimir Nabokov", 260, false);
 // Create library
 
 window.addEventListener('load', (event) => {
+    // create interface
     injectHTML(createLibraryHTML(myLibrary), "library");
     const addButton = document.querySelector("#header>button");
     const dialog = document.querySelector("dialog");
     const closeButton = document.querySelector("dialog button");
+    const deleteButtons = document.querySelectorAll(".delete");
     addButton.addEventListener("click", () => {
         dialog.showModal();
     });
@@ -68,7 +70,14 @@ window.addEventListener('load', (event) => {
         addBookToLibrary(title, author, pages, read);
         // close popup
         dialog.close();
-        // reload library
-        injectHTML(createLibraryHTML(myLibrary), "library");
-    })
+        // TODO add book to interface
+    });
+    deleteButtons.forEach(deleteButton => {
+        deleteButton.addEventListener("click", () => {
+            alert("event");
+            index = deleteButton.dataset.index;
+            myLibrary.splice(index, 1);
+            // TODO delete book from interface
+        });
+    });
 });
