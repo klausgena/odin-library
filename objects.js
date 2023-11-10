@@ -5,7 +5,7 @@ function Book(title, author, pages, read) {
     this.author = author;
     this.pages = pages;
     this.read = read;
-    const readString = read == "yes" ? "read" : "not read yet";
+    const readString = read == true ? "read" : "not read yet";
     this.info = function () {
         return `${title} by ${author}, ${pages} pages, ${readString}`;
     };
@@ -42,25 +42,16 @@ function injectHTML(HTML, id) {
 }
 
 
+// Create test data
 
-// TEST
+addBookToLibrary("War and Peace", "Lev Tolstoi", 760, true);
+addBookToLibrary("Lolita", "Vladimir Nabokov", 260, false);
 
-const dosto = new Book('Crime and Punishment', 'Fyodor Dosto', '567', 'no');
-addBookToLibrary("War and Peace", "Lev Tolstoi", 760, "yes");
-addBookToLibrary("Lolita", "Vladimir Nabokov", 260, "yes");
-console.log(myLibrary);
-console.log(dosto.info());
-console.log(myLibrary[0].info());
-console.log(dosto.valueOf());
-Object.getPrototypeOf(dosto);
-console.log(createBookHTML(dosto));
-console.log(createLibraryHTML(myLibrary));
 
 // Create library
 
 window.addEventListener('load', (event) => {
     injectHTML(createLibraryHTML(myLibrary), "library");
-    console.log("Page Loaded");
     const addButton = document.querySelector("#header>button");
     const dialog = document.querySelector("dialog");
     const closeButton = document.querySelector("dialog button");
@@ -68,9 +59,16 @@ window.addEventListener('load', (event) => {
         dialog.showModal();
     });
     closeButton.addEventListener("click", () => {
-        const bookData = new FormData(document.querySelector("form"));
-        alert(bookData[0]);
+        // get form data
+        let title = document.querySelector('#title').value;
+        let author = document.querySelector('#author').value;
+        let pages = document.querySelector('#pages').value;
+        let read = document.querySelector('#read').checked;
+        // add book to library
+        addBookToLibrary(title, author, pages, read);
+        // close popup
         dialog.close();
-        alert("Added book!");
+        // reload library
+        injectHTML(createLibraryHTML(myLibrary), "library");
     })
 });
