@@ -19,12 +19,19 @@ function addBookToLibrary(title, author, pages, read) {
 
 function createBookHTML(bookObject, index) {
     let bookHTML = "<div class='book'>";
+    let checked = "";
     for (let key in bookObject) {
         if (key == "info") { continue; };
+        if (key == "read") {
+            let bookElement = `<p class='${key}'>${key}: ${bookObject[key]}</p>`;
+            if (bookObject[key] == true) {
+                checked = "checked='checked'";
+            }
+        }
         let bookElement = `<p class='${key}'>${key}: ${bookObject[key]}</p>`;
         bookHTML = bookHTML + bookElement;
     }
-    return bookHTML + `<div><button class="delete" data-index=${index}>-</button ></div ><div><label for="read">Read?</label><input type="checkbox" id="read"></div></div>`;
+    return bookHTML + `<div><button class="delete" data-index=${index}>-</button ></div ><div><label>Read?</label><input type="checkbox" class="bread" data-index=${index} ${checked}></div></div>`;
 }
 
 function createLibraryHTML(booksArray) {
@@ -53,13 +60,13 @@ addBookToLibrary("Lolita", "Vladimir Nabokov", 260, false);
 window.addEventListener('load', (event) => {
     // create interface
     injectHTML(createLibraryHTML(myLibrary), "library");
+    // add book functionality
     const addButton = document.querySelector("#header>button");
-    const dialog = document.querySelector("dialog");
-    const closeButton = document.querySelector("dialog button");
-    const deleteButtons = document.querySelectorAll(".delete");
     addButton.addEventListener("click", () => {
         dialog.showModal();
     });
+    const dialog = document.querySelector("dialog");
+    const closeButton = document.querySelector("dialog button");
     closeButton.addEventListener("click", () => {
         // get form data
         let title = document.querySelector('#title').value;
@@ -70,14 +77,22 @@ window.addEventListener('load', (event) => {
         addBookToLibrary(title, author, pages, read);
         // close popup
         dialog.close();
-        // TODO add book to interface
+        // add book to interface
+        injectHTML(createLibraryHTML(myLibrary), "library");
     });
-    deleteButtons.forEach(deleteButton => {
-        deleteButton.addEventListener("click", () => {
-            alert("event");
-            index = deleteButton.dataset.index;
+    // event delegation for delete and read button - books
+    document.querySelector("#library").onclick = function (event) {
+        let target = event.target;
+        index = target.dataset.index;
+        if (target.className == "delete") {
             myLibrary.splice(index, 1);
-            // TODO delete book from interface
-        });
-    });
+            injectHTML(createLibraryHTML(myLibrary), "library");
+        }
+        // read button
+        if (target.className == "bread") {
+            myLibrary[index]["read"] = target.checked;
+            injectHTML(createLibraryHTML(myLibrary), "library");
+        }
+        else { return };
+    };
 });
