@@ -1,21 +1,43 @@
-const myLibrary = [];
-
-function Book(title, author, pages, read) {
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.read = read;
-    const readString = read == true ? "read" : "not read yet";
-    this.info = function () {
-        return `${title} by ${author}, ${pages} pages, ${readString}`;
-    };
-};
-
-function addBookToLibrary(title, author, pages, read) {
-    // gets called from the form
-    newBook = new Book(title, author, pages, read);
-    myLibrary.push(newBook);
+class Book {
+    #data = [];
+    constructor(title, author, pages, read) {
+        this.#data = [title, author, pages, read];
+    }
+    toHTML() {
+        const ul = document.createElement("ul");
+        #data.forEach(element => () {
+            const li = document.createElement("li");
+            li.textContent = element;
+            ul.appendChild(li);
+        })
+        return ul;
+    }
 }
+class Library {
+    #books = [];
+    constructor(owner) {
+        this.owner = owner;
+    }
+    info() {
+        return `${owner}'s library counts ${#books.length} books.`
+    }
+    addBook(book) {
+        this.#books.push(book);
+    }
+    removeBook(book) {
+        // TODO 
+    }
+    toHTML() {
+        this.#books.forEach(book => () {
+            // div with index
+            book.toHTML();
+        })
+    }
+}
+// OLD CODE
+
+
+
 
 function createBookHTML(bookObject, index) {
     let bookHTML = "<div class='book'>";
