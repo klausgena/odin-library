@@ -10,14 +10,14 @@ body {
     flex-direction: column;
 }
 
-#library {
+#my-library {
     padding: 2rem;
     display: grid;
     grid-template-columns: auto auto auto auto;
     gap: 1rem;
 }
 
-.book {
+.library-card {
     background-color: whitesmoke;
 }
 
