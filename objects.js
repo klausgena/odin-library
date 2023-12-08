@@ -9,10 +9,11 @@ class Book {
     toggleRead() {
         this.#read = this.#read == true ? false : true;
     }
-    toHTML() {
+    toHTML(index) {
         const ul = document.createElement("ul");
         const bookDiv = document.createElement("div");
         bookDiv.setAttribute("class", "library-card");
+        bookDiv.setAttribute("data-index", index);
         this.#data.forEach((element, index) => {
             if (index != 3) {
                 const li = document.createElement("li");
@@ -48,8 +49,8 @@ class Library {
     toHTML() {
         const libDiv = document.createElement("div");
         libDiv.setAttribute("id", "my-library");
-        this.#books.forEach((book) => {
-            const bookText = book.toHTML();
+        this.#books.forEach((book, index) => {
+            const bookText = book.toHTML(index);
             libDiv.appendChild(bookText);
         })
         return libDiv;
@@ -57,16 +58,39 @@ class Library {
 }
 class App {
     #library = {};
+    #showModalEvent() {
+        const addButton = document.getElementById("add-book");
+        const dialog = document.getElementById("add-book-form");
+        addButton.addEventListener("click", () => {
+            dialog.show();
+        })
+        this.#addBookEvent();
+    }
+    #addBookEvent() {
+        const addButton = document.querySelector("dialog button");
+        addButton.addEventListener("click", () => {
+            let author = document.getElementById("author").value;
+            let title = document.getElementById("title").value;
+            let pages = document.getElementById("pages").value;
+            let read = document.getElementById("read").checked;
+            let book = new Book(title, author, pages, read);
+            let dialog = document.getElementById("add-book-form");
+            this.addBook(book);
+            dialog.close();
+            this.redraw();
+        });
+    }
     constructor(library) {
         this.#library = library;
     }
     start() {
-        const contentDiv = document.getElementById("content");
-        contentDiv.appendChild(this.#library.toHTML());
+        this.redraw();
+        this.#showModalEvent();
         // TODO add events;
     }
     redraw() {
         const contentDiv = document.getElementById("content");
+        contentDiv.textContent = "";
         contentDiv.appendChild(this.#library.toHTML());
     }
     addBook(book) {
