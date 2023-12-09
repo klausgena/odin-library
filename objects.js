@@ -17,8 +17,8 @@ class Book {
         removeButton.textContent = " - ";
         removeButton.setAttribute("data-index", index);
         bookDiv.appendChild(removeButton);
-        this.#data.forEach((element, index) => {
-            if (index != 3) {
+        this.#data.forEach((element, i) => {
+            if (i != 3) {
                 const li = document.createElement("li");
                 li.textContent = element;
                 ul.appendChild(li);
@@ -51,7 +51,8 @@ class Library {
         this.#books.splice(index, 1);
     }
     toggleRead(index) {
-        this.#books[index].toggleRead();
+        const book = this.#books[index];
+        book.toggleRead();
     }
     toHTML() {
         const libDiv = document.createElement("div");
@@ -69,6 +70,7 @@ class App {
         this.#eventShowModal();
         this.#eventAddBook();
         this.#eventRemoveBook();
+        this.#eventToggleRead();
     }
     #eventShowModal() {
         const addButton = document.getElementById("add-book");
