@@ -27,8 +27,7 @@ class Book {
                 const checkbox = document.createElement("input");
                 checkbox.setAttribute("type", "checkbox");
                 checkbox.setAttribute("data-index", index);
-                checkbox.checked = false;
-                if (element) checkbox.checked = true;
+                checkbox.checked = this.#read;
                 ul.appendChild(checkbox);
             }
             bookDiv.appendChild(ul);
@@ -69,8 +68,12 @@ class App {
     #addEvents() {
         this.#eventShowModal();
         this.#eventAddBook();
-        this.#eventRemoveBook();
-        this.#eventToggleRead();
+        // event delegation
+        const contentDiv = document.getElementById("content");
+        contentDiv.onclick = (event) => {
+            this.#eventRemoveBook(event);
+            this.#eventToggleRead(event);
+        }
     }
     #eventShowModal() {
         const addButton = document.getElementById("add-book");
@@ -93,17 +96,18 @@ class App {
             this.#redraw();
         });
     }
-    #eventRemoveBook() {
-        // event delegation
-        const contentDiv = document.getElementById("content");
-        // to be able to access app private properties
-        const app = this;
-        contentDiv.onclick = function (event) {
-            const target = event.target;
-            if (target.className == "delete") {
-                app.#library.removeBook(target.dataset.index);
-                app.#redraw();
-            }
+    #eventRemoveBook(event) {
+        const target = event.target;
+        if (target.className == "delete") {
+            this.#library.removeBook(target.dataset.index);
+            this.#redraw();
+        }
+    }
+    #eventToggleRead(event) {
+        const target = event.target;
+        if (target.type == "checkbox") {
+            this.#library.toggleRead(target.dataset.index);
+            this.#redraw();
         }
     }
     constructor(library) {
@@ -120,20 +124,6 @@ class App {
     }
     addBook(book) {
         this.#library.addBook(book);
-    }
-    #eventToggleRead() {
-        // event delegation
-        const contentDiv = document.getElementById("content");
-        // to be able to access app private properties
-        const app = this;
-        contentDiv.onclick = function (event) {
-            const target = event.target;
-            alert(target.type);
-            if (target.type == "checkbox") {
-                app.#library.toggleRead(target.dataset.index);
-                app.#redraw();
-            }
-        }
     }
 }
 
