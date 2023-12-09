@@ -1,5 +1,4 @@
 class Book {
-    // TODO # data omzetten in object for key value in #data.entries
     #data = [];
     #read = false;
     constructor(title, author, pages, read) {
@@ -13,7 +12,11 @@ class Book {
         const ul = document.createElement("ul");
         const bookDiv = document.createElement("div");
         bookDiv.setAttribute("class", "library-card");
-        bookDiv.setAttribute("data-index", index);
+        const removeButton = document.createElement("button");
+        removeButton.setAttribute("class", "delete");
+        removeButton.textContent = " - ";
+        removeButton.setAttribute("data-index", index);
+        bookDiv.appendChild(removeButton);
         this.#data.forEach((element, index) => {
             if (index != 3) {
                 const li = document.createElement("li");
@@ -23,6 +26,7 @@ class Book {
             else {
                 const checkbox = document.createElement("input");
                 checkbox.setAttribute("type", "checkbox");
+                checkbox.setAttribute("data-index", index);
                 checkbox.checked = false;
                 if (element) checkbox.checked = true;
                 ul.appendChild(checkbox);
@@ -43,8 +47,11 @@ class Library {
     addBook(book) {
         this.#books.push(book);
     }
-    removeBook(badBook) {
-        this.#books = this.#books.filter((book) => book != badBook);
+    removeBook(index) {
+        this.#books.splice(index, 1);
+    }
+    toggleRead(index) {
+        this.#books[index].toggleRead();
     }
     toHTML() {
         const libDiv = document.createElement("div");
@@ -58,15 +65,19 @@ class Library {
 }
 class App {
     #library = {};
-    #showModalEvent() {
+    #addEvents() {
+        this.#eventShowModal();
+        this.#eventAddBook();
+        this.#eventRemoveBook();
+    }
+    #eventShowModal() {
         const addButton = document.getElementById("add-book");
         const dialog = document.getElementById("add-book-form");
         addButton.addEventListener("click", () => {
             dialog.show();
         })
-        this.#addBookEvent();
     }
-    #addBookEvent() {
+    #eventAddBook() {
         const addButton = document.querySelector("dialog button");
         addButton.addEventListener("click", () => {
             let author = document.getElementById("author").value;
@@ -75,20 +86,32 @@ class App {
             let read = document.getElementById("read").checked;
             let book = new Book(title, author, pages, read);
             let dialog = document.getElementById("add-book-form");
-            this.addBook(book);
+            this.#library.addBook(book);
             dialog.close();
-            this.redraw();
+            this.#redraw();
         });
+    }
+    #eventRemoveBook() {
+        // event delegation
+        const contentDiv = document.getElementById("content");
+        // to be able to access app private properties
+        const app = this;
+        contentDiv.onclick = function (event) {
+            const target = event.target;
+            if (target.className == "delete") {
+                app.#library.removeBook(target.dataset.index);
+                app.#redraw();
+            }
+        }
     }
     constructor(library) {
         this.#library = library;
     }
     start() {
-        this.redraw();
-        this.#showModalEvent();
-        // TODO add events;
+        this.#redraw();
+        this.#addEvents();
     }
-    redraw() {
+    #redraw() {
         const contentDiv = document.getElementById("content");
         contentDiv.textContent = "";
         contentDiv.appendChild(this.#library.toHTML());
@@ -96,11 +119,19 @@ class App {
     addBook(book) {
         this.#library.addBook(book);
     }
-    removeBook(book) {
-        this.#library.removeBook(book);
-    }
-    toggleRead(book) {
-        // TODO
+    #eventToggleRead() {
+        // event delegation
+        const contentDiv = document.getElementById("content");
+        // to be able to access app private properties
+        const app = this;
+        contentDiv.onclick = function (event) {
+            const target = event.target;
+            alert(target.type);
+            if (target.type == "checkbox") {
+                app.#library.toggleRead(target.dataset.index);
+                app.#redraw();
+            }
+        }
     }
 }
 
@@ -113,51 +144,3 @@ const myApp = new App(myLib);
 myApp.addBook(bookOne);
 myApp.addBook(bookTwo);
 myApp.start();
-
-// Generate html
-
-
-// Add Event listeners
-// Modal dialog
-// Remove book
-// Change read status
-
-// window.addEventListener('load', (event) => {
-//     // create interface
-//     injectHTML(createLibraryHTML(myLibrary), "library");
-//     // add book functionality
-//     const addButton = document.querySelector("#header>button");
-//     addButton.addEventListener("click", () => {
-//         dialog.showModal();
-//     });
-//     const dialog = document.querySelector("dialog");
-//     const closeButton = document.querySelector("dialog button");
-//     closeButton.addEventListener("click", () => {
-//         // get form data
-//         let title = document.querySelector('#title').value;
-//         let author = document.querySelector('#author').value;
-//         let pages = document.querySelector('#pages').value;
-//         let read = document.querySelector('#read').checked;
-//         // add book to library
-//         addBookToLibrary(title, author, pages, read);
-//         // close popup
-//         dialog.close();
-//         // add book to interface
-//         injectHTML(createLibraryHTML(myLibrary), "library");
-//     });
-//     // event delegation for delete and read button - books
-//     document.querySelector("#library").onclick = function (event) {
-//         let target = event.target;
-//         index = target.dataset.index;
-//         if (target.className == "delete") {
-//             myLibrary.splice(index, 1);
-//             injectHTML(createLibraryHTML(myLibrary), "library");
-//         }
-//         // read button
-//         if (target.className == "bread") {
-//             myLibrary[index]["read"] = target.checked;
-//             injectHTML(createLibraryHTML(myLibrary), "library");
-//         }
-//         else { return };
-//     };
-// });
